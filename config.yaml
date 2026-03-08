@@ -1,0 +1,44 @@
+app:
+  name: welo-threat-intel-api
+  version: 2.4.1
+  environment: development
+  log_level: INFO
+
+server:
+  host: 0.0.0.0
+  port: 8080
+  workers: 4
+  timeout: 30
+
+database:
+  pool_size: 10
+  max_overflow: 20
+  pool_timeout: 30
+
+feeds:
+  refresh_interval_seconds: 300
+  sources:
+    - name: welo-cve-feed
+      url: ${CVE_FEED_URL}
+      format: json
+      enabled: true
+    - name: welo-malware-feed
+      url: ${THREAT_FEED_URL}
+      format: stix2
+      enabled: true
+    - name: nist-nvd
+      url: https://services.nvd.nist.gov/rest/json/cves/2.0
+      format: json
+      enabled: true
+
+risk_scoring:
+  model_version: 3.1
+  thresholds:
+    low: 3.0
+    medium: 6.0
+    high: 8.5
+    critical: 9.5
+  weights:
+    identity_anomaly: 0.35
+    malware_match: 0.40
+    vulnerability_exposure: 0.25
